@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APAR Calculator - BS 5306</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        .calculator-shadow {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .fire-class-btn {
+            transition: all 0.2s ease;
+        }
+        .fire-class-btn:hover {
+            transform: scale(1.05);
+        }
+        .tab-active {
+            border-bottom: 3px solid #667eea;
+            font-weight: 600;
+        }
+        .result-box {
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">APAR Calculator</h1>
+            <p class="text-xl text-gray-600">Based on British Standard 5306</p>
+            <div class="mt-4">
+                <img src="https://placehold.co/800x200" alt="Fire safety equipment symbol with red fire extinguisher and safety signs" />
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl calculator-shadow overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-2xl font-semibold text-gray-800">Fire Extinguisher Requirement Calculator</h2>
+                <p class="text-gray-600 mt-2">Calculate the minimum number of fire extinguishers required according to BS 5306 standards.</p>
+            </div>
+
+            <div class="p-6">
+                <div class="flex space-x-4 mb-6 border-b border-gray-200">
+                    <button id="floor-tab" class="pb-2 px-1 text-gray-700 tab-active">Floor Area Calculation</button>
+                    <button id="specific-tab" class="pb-2 px-1 text-gray-700">Specific Hazards Calculation</button>
+                </div>
+
+                <!-- Floor Area Calculator -->
+                <div id="floor-calculator" class="space-y-6">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Floor Area (m²)</label>
+                        <input type="number" id="floor-area" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter floor area in square meters">
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 mb-2">Fire Class</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <button data-class="A" class="fire-class-btn bg-blue-100 text-blue-800 py-2 px-4 rounded-lg border border-blue-200">Class A</button>
+                            <button data-class="B" class="fire-class-btn bg-red-100 text-red-800 py-2 px-4 rounded-lg border border-red-200">Class B</button>
+                            <button data-class="C" class="fire-class-btn bg-yellow-100 text-yellow-800 py-2 px-4 rounded-lg border border-yellow-200">Class C</button>
+                            <button data-class="F" class="fire-class-btn bg-purple-100 text-purple-800 py-2 px-4 rounded-lg border border-purple-200">Class F</button>
+                        </div>
+                    </div>
+
+                    <div id="floor-fire-class" class="hidden">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="font-medium text-gray-800 mb-2">Selected Fire Class: <span id="selected-class" class="font-semibold"></span></h3>
+                            <p id="class-description" class="text-gray-600 text-sm"></p>
+                        </div>
+                    </div>
+
+                    <button id="calculate-floor" class="btn-primary text-white py-3 px-6 rounded-lg w-full font-medium">Calculate</button>
+                </div>
+
+                <!-- Specific Hazards Calculator -->
+                <div id="specific-calculator" class="space-y-6 hidden">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Hazard Type</label>
+                        <select id="hazard-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="">Select hazard type</option>
+                            <option value="kitchen">Kitchen (Class F)</option>
+                            <option value="electrical">Electrical Equipment</option>
+                            <option value="chemical">Chemical Storage</option>
+                            <option value="workshop">Workshop Areas</option>
+                            <option value="server">Server Rooms</option>
+                        </select>
+                    </div>
+
+                    <div id="hazard-specific-inputs" class="space-y-4 hidden">
+                        <!-- Dynamic inputs will be added here -->
+                    </div>
+
+                    <button id="calculate-specific" class="btn-primary text-white py-3 px-6 rounded-lg w-full font-medium">Calculate</button>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results" class="p-6 bg-gray-50 border-t border-gray-200 hidden">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Results</h3>
+                <div id="result-content" class="result-box space-y-4">
+                    <!-- Results will be displayed here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 bg-white rounded-xl p-6 calculator-shadow">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">About BS 5306</h3>
+            <p class="text-gray-600 mb-4">British Standard 5306 provides guidance on the provision of fire extinguishers in buildings. The standard specifies the minimum number and type of fire extinguishers required based on floor area and potential fire hazards.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="font-medium text-gray-800 mb-2">Fire Classes</h4>
+                    <ul class="text-gray-600 text-sm space-y-2">
+                        <li><span class="font-medium">Class A:</span> Fires involving solid materials like wood, paper, textiles</li>
+                        <li><span class="font-medium">Class B:</span> Fires involving flammable liquids like petrol, oil, paint</li>
+                        <li><span class="font-medium">Class C:</span> Fires involving gases like propane, butane, methane</li>
+                        <li><span class="font-medium">Class F:</span> Fires involving cooking oils and fats</li>
+                    </ul>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="font-medium text-gray-800 mb-2">Notes</h4>
+                    <ul class="text-gray-600 text-sm space-y-2">
+                        <li>Extinguishers should be located near exits and escape routes</li>
+                        <li>Travel distance to extinguisher should not exceed 30m for Class A fires</li>
+                        <li>Regular maintenance and inspections are required</li>
+                        <li>Staff should be trained in proper extinguisher use</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching
+            document.getElementById('floor-tab').addEventListener('click', function() {
+                document.getElementById('floor-calculator').classList.remove('hidden');
+                document.getElementById('specific-calculator').classList.add('hidden');
+                document.getElementById('floor-tab').classList.add('tab-active');
+                document.getElementById('specific-tab').classList.remove('tab-active');
+                document.getElementById('results').classList.add('hidden');
+            });
+
+            document.getElementById('specific-tab').addEventListener('click', function() {
+                document.getElementById('floor-calculator').classList.add('hidden');
+                document.getElementById('specific-calculator').classList.remove('hidden');
+                document.getElementById('floor-tab').classList.remove('tab-active');
+                document.getElementById('specific-tab').classList.add('tab-active');
+                document.getElementById('results').classList.add('hidden');
+            });
+
+            // Fire class selection
+            const fireClassBtns = document.querySelectorAll('.fire-class-btn');
+            fireClassBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    fireClassBtns.forEach(b => b.classList.remove('bg-indigo-100', 'border-indigo-300'));
+                    this.classList.add('bg-indigo-100', 'border-indigo-300');
+                    
+                    const fireClass = this.dataset.class;
+                    document.getElementById('selected-class').textContent = `Class ${fireClass}`;
+                    
+                    let description = '';
+                    switch(fireClass) {
+                        case 'A':
+                            description = 'Fires involving solid combustible materials (wood, paper, textiles, etc.)';
+                            break;
+                        case 'B':
+                            description = 'Fires involving flammable liquids (petrol, oil, paint, etc.)';
+                            break;
+                        case 'C':
+                            description = 'Fires involving flammable gases (propane, butane, methane, etc.)';
+                            break;
+                        case 'F':
+                            description = 'Fires involving cooking oils and fats (kitchen fires)';
+                            break;
+                    }
+                    
+                    document.getElementById('class-description').textContent = description;
+                    document.getElementById('floor-fire-class').classList.remove('hidden');
+                });
+            });
+
+            // Hazard type selection
+            document.getElementById('hazard-type').addEventListener('change', function() {
+                const hazardType = this.value;
+                const inputsContainer = document.getElementById('hazard-specific-inputs');
+                inputsContainer.innerHTML = '';
+                
+                if (hazardType) {
+                    inputsContainer.classList.remove('hidden');
+                    
+                    switch(hazardType) {
+                        case 'kitchen':
+                            inputsContainer.innerHTML = `
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Kitchen Size (m²)</label>
+                                    <input type="number" id="kitchen-size" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Number of Cooking Appliances</label>
+                                    <input type="number" id="cooking-appliances" class="w-full px-4 py-2 border border-gray-300 rounded-lg" value="1">
+                                </div>
+                            `;
+                            break;
+                        case 'electrical':
+                            inputsContainer.innerHTML = `
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Room Size (m²)</label>
+                                    <input type="number" id="electrical-room-size" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Equipment Heat Output</label>
+                                    <select id="heat-output" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                        <option value="low">Low (Office equipment)</option>
+                                        <option value="medium">Medium (Servers, networking)</option>
+                                        <option value="high">High (Industrial equipment)</option>
+                                    </select>
+                                </div>
+                            `;
+                            break;
+                        case 'chemical':
+                            inputsContainer.innerHTML = `
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Storage Area Size (m²)</label>
+                                    <input type="number" id="chemical-storage-size" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Chemical Flammability</label>
+                                    <select id="flammability" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                        <option value="low">Low flammability</option>
+                                        <option value="medium">Medium flammability</option>
+                                        <option value="high">High flammability (flammable liquids)</option>
+                                    </select>
+                                </div>
+                            `;
+                            break;
+                        case 'workshop':
+                            inputsContainer.innerHTML = `
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Workshop Area (m²)</label>
+                                    <input type="number" id="workshop-area" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Activities</label>
+                                    <select id="workshop-activities" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                        <option value="wood">Woodworking</option>
+                                        <option value="metal">Metalworking</option>
+                                        <option value="auto">Automotive</option>
+                                        <option value="mixed">Mixed activities</option>
+                                    </select>
+                                </div>
+                            `;
+                            break;
+                        case 'server':
+                            inputsContainer.innerHTML = `
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Server Room Size (m²)</label>
+                                    <input type="number" id="server-room-size" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Number of Racks</label>
+                                    <input type="number" id="server-racks" class="w-full px-4 py-2 border border-gray-300 rounded-lg" value="1">
+                                </div>
+                            `;
+                            break;
+                    }
+                } else {
+                    inputsContainer.classList.add('hidden');
+                }
+            });
+
+            // Calculation functions
+            function calculateFloorAreaRequirements(area, fireClass) {
+                let extinguishers = 0;
+                let notes = [];
+                
+                if (fireClass === 'A') {
+                    if (area <= 200) {
+                        extinguishers = 1;
+                        notes.push(`Minimum 1 extinguisher with 13A rating for areas ≤ 200m²`);
+                    } else {
+                        extinguishers = Math.ceil(area / 200);
+                        notes.push(`1 extinguisher per 200m² with 13A rating each`);
+                    }
+                } else if (fireClass === 'B') {
+                    extinguishers = Math.max(1, Math.ceil(area / 1000));
+                    notes.push(`Minimum 1 extinguisher with at least 21B rating, additional for areas > 1000m²`);
+                } else if (fireClass === 'F') {
+                    extinguishers = 1; // At least one F class extinguisher for kitchens
+                    notes.push(`Minimum 1 Class F extinguisher for cooking areas`);
+                } else {
+                    extinguishers = 1; // Default for Class C and other specific cases
+                    notes.push(`Specialized extinguisher required based on specific hazards`);
+                }
+                
+                // Add BS 5306 travel distance requirement
+                notes.push(`Travel distance to extinguisher should not exceed 30m for Class A fires`);
+                
+                // Add mounting height recommendation
+                notes.push(`Extinguishers should be mounted at a height of 1-1.2m from the floor`);
+                
+                return {
+                    extinguishers,
+                    notes
+                };
+            }
+            
+            function calculateSpecificHazardRequirements(type, inputs) {
+                let extinguishers = 0;
+                let extinguisherTypes = [];
+                let notes = [];
+                
+                switch(type) {
+                    case 'kitchen':
+                        extinguishers = Math.max(1, Math.ceil(inputs.appliances / 2));
+                        extinguisherTypes.push('Wet chemical (Class F)');
+                        notes.push(`1 Class F extinguisher per 2 cooking appliances`);
+                        notes.push(`Position extinguishers to avoid splashing hot oil`);
+                        break;
+                    case 'electrical':
+                        extinguishers = inputs.heat === 'high' ? Math.ceil(inputs.size / 50) : 1;
+                        extinguisherTypes.push('CO₂ (Carbon Dioxide)');
+                        extinguisherTypes.push('Powder (Class E)');
+                        notes.push(`Use non-conductive extinguishing agents for electrical fires`);
+                        notes.push(`CO₂ recommended for sensitive equipment`);
+                        break;
+                    case 'chemical':
+                        extinguishers = inputs.flammability === 'high' ? 2 : 1;
+                        extinguisherTypes.push('Foam (Class B)');
+                        extinguisherTypes.push('Powder (ABC)');
+                        notes.push(`Additional extinguishers required for high flammability chemicals`);
+                        notes.push(`Ensure extinguisher type matches chemical compatibility`);
+                        break;
+                    case 'workshop':
+                        extinguishers = inputs.activities === 'metal' ? 2 : 1;
+                        extinguisherTypes.push('Foam (Class B) for flammable liquids');
+                        extinguisherTypes.push('Dry powder for metal fires if applicable');
+                        notes.push(`Consider specialized extinguishers for metalworking processes`);
+                        notes.push(`Position extinguishers near high-risk areas`);
+                        break;
+                    case 'server':
+                        extinguishers = Math.max(1, Math.ceil(inputs.racks / 2));
+                        extinguisherTypes.push('CO₂ (Carbon Dioxide)');
+                        notes.push(`1 CO₂ extinguisher per 2 server racks recommended`);
+                        notes.push(`Consider clean agent systems for critical server rooms`);
+                        break;
+                }
+                
+                return {
+                    extinguishers,
+                    extinguisherTypes,
+                    notes
+                };
+            }
+            
+            // Floor area calculation
+            document.getElementById('calculate-floor').addEventListener('click', function() {
+                const area = parseFloat(document.getElementById('floor-area').value);
+                const fireClass = document.querySelector('.fire-class-btn.bg-indigo-100')?.dataset.class;
+                
+                if (!area) {
+                    alert('Please enter floor area');
+                    return;
+                }
+                
+                if (!fireClass) {
+                    alert('Please select fire class');
+                    return;
+                }
+                
+                const result = calculateFloorAreaRequirements(area, fireClass);
+                
+                const resultContent = document.getElementById('result-content');
+                resultContent.innerHTML = `
+                    <div class="bg-white p-4 rounded-lg border border-gray-200">
+                        <h4 class="font-semibold text-lg text-gray-800 mb-2">Calculation Results</h4>
+                        <p class="text-gray-600 mb-3">For a floor area of <span class="font-medium">${area} m²</span> and <span class="font-medium">Class ${fireClass}</span> fire risk:</p>
+                        
+                        <div class="bg-blue-50 p-3 rounded-lg mb-3">
+                            <p class="text-blue-800 font-medium">Recommended extinguishers: <span class="text-lg">${result.extinguishers}</span></p>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h5 class="font-medium text-gray-700 mb-2">Recommended Extinguisher Type(s):</h5>
+                            <ul class="list-disc pl-5 text-gray-600 space-y-1">
+                                ${fireClass === 'A' ? '<li>Water (Class A)</li>' : ''}
+                                ${fireClass === 'B' ? '<li>Foam (Class B)</li><li>Dry Powder (Class B)</li>' : ''}
+                                ${fireClass === 'C' ? '<li>Dry Powder (Class C)</li>' : ''}
+                                ${fireClass === 'F' ? '<li>Wet Chemical (Class F)</li>' : ''}
+                            </ul>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h5 class="font-medium text-gray-700 mb-2">Notes:</h5>
+                            <ul class="list-disc pl-5 text-gray-600 space-y-1">
+                                ${result.notes.map(note => `<li>${note}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('results').classList.remove('hidden');
+            });
+            
+            // Specific hazard calculation
+            document.getElementById('calculate-specific').addEventListener('click', function() {
+                const hazardType = document.getElementById('hazard-type').value;
+                
+                if (!hazardType) {
+                    alert('Please select hazard type');
+                    return;
+                }
+                
+                let inputs = {};
+                
+                switch(hazardType) {
+                    case 'kitchen':
+                        inputs.size = parseFloat(document.getElementById('kitchen-size').value) || 0;
+                        inputs.appliances = parseInt(document.getElementById('cooking-appliances').value) || 1;
+                        break;
+                    case 'electrical':
+                        inputs.size = parseFloat(document.getElementById('electrical-room-size').value) || 0;
+                        inputs.heat = document.getElementById('heat-output').value;
+                        break;
+                    case 'chemical':
+                        inputs.size = parseFloat(document.getElementById('chemical-storage-size').value) || 0;
+                        inputs.flammability = document.getElementById('flammability').value;
+                        break;
+                    case 'workshop':
+                        inputs.size = parseFloat(document.getElementById('workshop-area').value) || 0;
+                        inputs.activities = document.getElementById('workshop-activities').value;
+                        break;
+                    case 'server':
+                        inputs.size = parseFloat(document.getElementById('server-room-size').value) || 0;
+                        inputs.racks = parseInt(document.getElementById('server-racks').value) || 1;
+                        break;
+                }
+                
+                const result = calculateSpecificHazardRequirements(hazardType, inputs);
+                
+                const hazardNames = {
+                    'kitchen': 'Kitchen/Class F',
+                    'electrical': 'Electrical Equipment',
+                    'chemical': 'Chemical Storage',
+                    'workshop': 'Workshop Area',
+                    'server': 'Server Room'
+                };
+                
+                const resultContent = document.getElementById('result-content');
+                resultContent.innerHTML = `
+                    <div class="bg-white p-4 rounded-lg border border-gray-200">
+                        <h4 class="font-semibold text-lg text-gray-800 mb-2">Calculation Results</h4>
+                        <p class="text-gray-600 mb-3">For <span class="font-medium">${hazardNames[hazardType]}</span> hazard:</p>
+                        
+                        <div class="bg-blue-50 p-3 rounded-lg mb-3">
+                            <p class="text-blue-800 font-medium">Recommended extinguishers: <span class="text-lg">${result.extinguishers}</span></p>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h5 class="font-medium text-gray-700 mb-2">Recommended Extinguisher Type(s):</h5>
+                            <ul class="list-disc pl-5 text-gray-600 space-y-1">
+                                ${result.extinguisherTypes.map(type => `<li>${type}</li>`).join('')}
+                            </ul>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h5 class="font-medium text-gray-700 mb-2">Placement Recommendations:</h5>
+                            <ul class="list-disc pl-5 text-gray-600 space-y-1">
+                                ${result.notes.map(note => `<li>${note}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('results').classList.remove('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
