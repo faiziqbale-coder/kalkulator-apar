@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APAR Calculator - BS 5306</title>
+    <title>Rafex Kalkulator - BS 5306</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .gradient-bg {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
         }
         .calculator-shadow {
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px rgba(255, 13, 13, 0.1);
         }
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f60e0e 0%, #000000 100%);
             transition: all 0.3s ease;
         }
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 15px rgba(231, 31, 31, 0.4);
         }
         .fire-class-btn {
             transition: all 0.2s ease;
@@ -27,7 +27,7 @@
             transform: scale(1.05);
         }
         .tab-active {
-            border-bottom: 3px solid #667eea;
+            border-bottom: 3px solid #d31c12;
             font-weight: 600;
         }
         .result-box {
@@ -53,8 +53,8 @@
 
             <div class="p-6">
                 <div class="flex space-x-4 mb-6 border-b border-gray-200">
-                    <button id="floor-tab" class="pb-2 px-1 text-gray-700 tab-active">Pehitungan Luas Lantai.</button>
-                    <button id="specific-tab" class="pb-2 px-1 text-gray-700">Pehitungan Bahaya Spesifik</button>
+                    <button id="floor-tab" class="pb-2 px-1 text-gray-700 tab-active">Berdasarkan Luas Lantai.</button>
+                    <button id="specific-tab" class="pb-2 px-1 text-gray-700">Berdasarkan Bahaya Spesifik</button>
                 </div>
 
                 <!-- Floor Area Calculator -->
@@ -87,7 +87,7 @@
                 <!-- Specific Hazards Calculator -->
                 <div id="specific-calculator" class="space-y-6 hidden">
                     <div>
-                        <label class="block text-gray-700 mb-2">Hazard Type</label>
+                        <label class="block text-gray-700 mb-2">Kriteria Lokasi</label>
                         <select id="hazard-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                             <option value="">Select hazard type</option>
                             <option value="kitchen">Kitchen (Class F)</option>
@@ -204,11 +204,11 @@
                         case 'kitchen':
                             inputsContainer.innerHTML = `
                                 <div>
-                                    <label class="block text-gray-700 mb-2">Kitchen Size (m²)</label>
+                                    <label class="block text-gray-700 mb-2">Luas Dapur (m²)</label>
                                     <input type="number" id="kitchen-size" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                                 </div>
                                 <div>
-                                    <label class="block text-gray-700 mb-2">Number of Cooking Appliances</label>
+                                    <label class="block text-gray-700 mb-2">Banyaknya Peralatan Memasak</label>
                                     <input type="number" id="cooking-appliances" class="w-full px-4 py-2 border border-gray-300 rounded-lg" value="1">
                                 </div>
                             `;
@@ -216,7 +216,7 @@
                         case 'electrical':
                             inputsContainer.innerHTML = `
                                 <div>
-                                    <label class="block text-gray-700 mb-2">Room Size (m²)</label>
+                                    <label class="block text-gray-700 mb-2">Luas Ruangan (m²)</label>
                                     <input type="number" id="electrical-room-size" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                                 </div>
                                 <div>
@@ -232,11 +232,11 @@
                         case 'chemical':
                             inputsContainer.innerHTML = `
                                 <div>
-                                    <label class="block text-gray-700 mb-2">Storage Area Size (m²)</label>
+                                    <label class="block text-gray-700 mb-2">Luas Area Gudang (m²)</label>
                                     <input type="number" id="chemical-storage-size" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                                 </div>
                                 <div>
-                                    <label class="block text-gray-700 mb-2">Chemical Flammability</label>
+                                    <label class="block text-gray-700 mb-2">Level Bahan Mudah Terbakar</label>
                                     <select id="flammability" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                                         <option value="low">Low flammability</option>
                                         <option value="medium">Medium flammability</option>
@@ -294,7 +294,7 @@
                         notes.push(`1 alat pemadam api per 200m² dengan rating 13A masing-masing`);
                     }
                 } else if (fireClass === 'B') {
-                    extinguishers = Math.max(1, Math.ceil(area / 1000));
+                    extinguishers = Math.max(1, Math.ceil(area / 300));
                     notes.push(`Minimal 1 alat pemadam api dengan rating minimal 144B tambahan untuk area > 1000m²`);
                 } else if (fireClass === 'F') {
                     extinguishers = 1; // At least one F class extinguisher for kitchens
